@@ -7,13 +7,13 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
     try {
         const supabase = createClient()
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { user } } = await supabase.auth.getUser()
 
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        if (!user) {
+            return NextResponse.json([])
         }
 
-        const summaries = await getUserSummaries()
+        const summaries = await getUserSummaries(user.id)
         return NextResponse.json(summaries || [])
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 })
