@@ -5,10 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Trash2, ExternalLink, RefreshCw, Terminal } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import { useRouter } from 'next/navigation'
 
 export default function MemoryLogsPage() {
+    const router = useRouter()
     const [logs, setLogs] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [expandedLogId, setExpandedLogId] = useState<string | null>(null)
 
     const fetchLogs = async () => {
         setIsLoading(true)
@@ -79,7 +82,7 @@ export default function MemoryLogsPage() {
             ) : logs.length === 0 ? (
                 <Card className="border border-dashed border-[#FDE68A]/30 bg-[#111111]/50 flex flex-col items-center justify-center p-12 text-center text-[#FDE68A]/60 h-[400px] rounded-none">
                     <p className="mb-4 font-mono">{'>'} ERR: NO_MEMORY_FOUND</p>
-                    <Button variant="outline" onClick={() => window.location.href = '/dashboard'} className="border-[#FDE68A]/30 text-[#FDE68A] hover:bg-[#FDE68A]/10 bg-transparent rounded-none uppercase">
+                    <Button variant="outline" onClick={() => router.push('/dashboard')} className="border-[#FDE68A]/30 text-[#FDE68A] hover:bg-[#FDE68A]/10 bg-transparent rounded-none uppercase">
                         INIT_SUMMARY_TASK
                     </Button>
                 </Card>
@@ -109,12 +112,17 @@ export default function MemoryLogsPage() {
                                 </div>
                             </CardHeader>
                             <CardContent className="p-4 pt-4 flex-1 flex flex-col relative">
-                                <p className="text-xs text-[#FFF7CC]/80 line-clamp-3 mb-4 flex-1">
+                                <p className={`text-xs text-[#FFF7CC]/80 mb-4 whitespace-pre-wrap transition-all ${expandedLogId === log.id ? '' : 'line-clamp-3 flex-1'}`}>
                                     {log.summary}
                                 </p>
-                                <div className="flex justify-between items-center pt-4 border-t border-[#FDE68A]/10 mt-auto">
-                                    <Button variant="ghost" size="sm" className="h-8 px-2 text-[#FDE68A] hover:bg-[#FDE68A]/10 hover:text-[#FFF7CC] text-xs tracking-widest rounded-none" onClick={() => window.location.href = `/dashboard?id=${log.id}`}>
-                                        [ LOAD_DATA ]
+                                <div className={`flex justify-between items-center pt-4 border-t border-[#FDE68A]/10 mt-auto ${expandedLogId === log.id ? 'mt-4' : ''}`}>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 px-2 text-[#FDE68A] hover:bg-[#FDE68A]/10 hover:text-[#FFF7CC] text-xs tracking-widest rounded-none"
+                                        onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
+                                    >
+                                        {expandedLogId === log.id ? '[ CLOSE_DATA ]' : '[ LOAD_DATA ]'}
                                     </Button>
                                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-950/50 rounded-none border border-transparent hover:border-red-500/30" onClick={() => handleDelete(log.id)}>
                                         <Trash2 className="h-4 w-4" />
