@@ -172,3 +172,37 @@ export async function saveUserConfig(configData: { summary_style?: string, summa
     }
     return data
 }
+import { createClient } from "@/lib/supabase/client"
+
+export async function getUserSummaries(userId: string) {
+    const supabase = createClient()
+
+    const { data, error } = await supabase
+        .from("summaries")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+
+    if (error) {
+        console.error("Error fetching summaries:", error)
+        throw error
+    }
+
+    return data
+}
+
+export async function deleteSummary(id: string) {
+    const supabase = createClient()
+
+    const { error } = await supabase
+        .from("summaries")
+        .delete()
+        .eq("id", id)
+
+    if (error) {
+        console.error("Error deleting summary:", error)
+        throw error
+    }
+
+    return true
+}
