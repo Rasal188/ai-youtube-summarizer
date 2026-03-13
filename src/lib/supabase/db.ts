@@ -172,7 +172,6 @@ export async function saveUserConfig(configData: { summary_style?: string, summa
     }
     return data
 }
-import { createClient } from "@/lib/supabase/client"
 
 export async function getUserSummaries(userId: string) {
     const supabase = createClient()
